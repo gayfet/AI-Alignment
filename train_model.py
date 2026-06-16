@@ -147,9 +147,9 @@ def train_model():
     plt.plot(range(1, epochs + 1), epoch_losses, marker='o', linestyle='-', color='b')
     
     # Label the graph
-    plt.title('AI Training Efficiency (Loss per Epoch)')
-    plt.xlabel('Epoch (Iteration)')
-    plt.ylabel('Mean Squared Error (Lower is Better)')
+    plt.title('AI Performance')
+    plt.xlabel('Epoch')
+    plt.ylabel('MSE')
     plt.grid(True)
     
     # Save the graph as an image
