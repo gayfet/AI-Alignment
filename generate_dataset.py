@@ -14,7 +14,7 @@ def generate_wafer_dataset(num_images=1000):
     max_shift_px = 30.0
     max_rotation_deg = 15.0
 
-    print(f"Generating {num_images} images with segmented outer box in: {output_dir}")
+    print(f"Generating {num_images} images with broken-cross reference mark in: {output_dir}")
 
     with open(csv_path, mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -24,27 +24,24 @@ def generate_wafer_dataset(num_images=1000):
             # 1. Create the Canvas with Synthetic Noise
             img = np.random.randint(220, 256, (256, 256), dtype=np.uint8)
 
-            # 2. Draw the Static Reference Mark (Four L-Shaped Corners)
-            # The bounding area is still 98 to 158. 
-            # The gaps between the brackets are 20 pixels wide (from 118 to 138) to allow the cross arms to fit.
             thickness = 4
             color = (0,)
 
-            # Top-Left Bracket
-            cv2.line(img, (98, 118), (98, 98), color, thickness)   # Vertical drop
-            cv2.line(img, (98, 98), (118, 98), color, thickness)   # Horizontal right
+            # 2. Draw the Static Reference Mark (Broken Outer Cross)
+            # The inner cross extends +/- 20 pixels from the center (128).
+            # We start these outer arms at +/- 28 pixels to leave a clean 8-pixel gap.
             
-            # Top-Right Bracket
-            cv2.line(img, (138, 98), (158, 98), color, thickness)  # Horizontal right
-            cv2.line(img, (158, 98), (158, 118), color, thickness) # Vertical drop
-
-            # Bottom-Right Bracket
-            cv2.line(img, (158, 138), (158, 158), color, thickness) # Vertical drop
-            cv2.line(img, (158, 158), (138, 158), color, thickness) # Horizontal left
-
-            # Bottom-Left Bracket
-            cv2.line(img, (118, 158), (98, 158), color, thickness)  # Horizontal left
-            cv2.line(img, (98, 158), (98, 138), color, thickness)   # Vertical up
+            # Top Arm (Vertical line, stopping before the center)
+            cv2.line(img, (128, 70), (128, 100), color, thickness)
+            
+            # Bottom Arm (Vertical line, starting after the center)
+            cv2.line(img, (128, 156), (128, 186), color, thickness)
+            
+            # Left Arm (Horizontal line, stopping before the center)
+            cv2.line(img, (70, 128), (100, 128), color, thickness)
+            
+            # Right Arm (Horizontal line, starting after the center)
+            cv2.line(img, (156, 128), (186, 128), color, thickness)
 
             # 3. Generate Random Transformation Parameters
             shift_x = random.uniform(-max_shift_px, max_shift_px)
@@ -54,7 +51,7 @@ def generate_wafer_dataset(num_images=1000):
             # 4. Create the Target Cross on a Separate Blank Layer
             cross_layer = np.full((256, 256), 255, dtype=np.uint8)
             
-            # Draw the Cross centered at (128, 128) with 40px arms.
+            # Inner Cross centered at (128, 128) with +/- 20px arms.
             cv2.line(cross_layer, (128, 108), (128, 148), color, thickness) # Vertical
             cv2.line(cross_layer, (108, 128), (148, 128), color, thickness) # Horizontal
 
